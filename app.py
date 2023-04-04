@@ -13,7 +13,7 @@ from flask import Flask, jsonify
 #################################################
 # Database Setup
 #################################################
-engine = create_engine("sqlite:///AllAus_Weather_History.sqlite")
+engine = create_engine("sqlite:///AllAus_Weather_History")
 
 # reflect an existing database into a new model
 Base = automap_base()
