@@ -19,7 +19,7 @@ engine = create_engine("sqlite:///AllAus_Weather_History")
 Base = automap_base()
 
 # reflect the tables
-Base.prepare(autoload_with=engine, echo=False)
+Base.prepare(autoload_with=engine)
 
 # Save reference to the table
 AusCityWeather = Base.classes.auscityweather
