@@ -13,7 +13,7 @@ from flask import Flask, jsonify
 #################################################
 # Database Setup
 #################################################
-engine = create_engine("sqlite:///AllAus_Weather_History")
+engine = create_engine("sqlite:///AllAus_Weather_History11.sqlite")
 
 # reflect an existing database into a new model
 Base = automap_base()
@@ -24,11 +24,11 @@ Base.prepare(autoload_with=engine)
 # Save reference to the table
 AusCityWeather = Base.classes.auscityweather
 
-def getlastyeardate(session):
-    latest_date = session.query(func.max(AusCityWeather.date)).first()[0]
-    latest_date = datetime.strptime(latest_date, '%Y-%m-%d')
-    last_year_date = latest_date - relativedelta(years=1)
-    return last_year_date.strftime('%Y-%m-%d')
+# def getlastyeardate(session):
+#     latest_date = session.query(func.max(AusCityWeather.date)).first()[0]
+#     latest_date = datetime.strptime(latest_date, '%Y-%m-%d')
+#     last_year_date = latest_date - relativedelta(years=1)
+#     return last_year_date.strftime('%Y-%m-%d')
 #################################################
 # Flask Setup
 #################################################
