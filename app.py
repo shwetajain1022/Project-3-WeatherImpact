@@ -43,20 +43,36 @@ def welcome():
     """List all available api routes."""
     return (
         f"Available Routes:<br/>"
+        f"/api/v1.0/city</br>"
         f"/api/v1.0/rainfall/<location></br>"
         f"/api/v1.0/rainfall/<location>/<year></br>"
+
     )
+@app.route("/api/v1.0/city")
+def city():
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    """Return a list of all city"""
+    # Query all 
+    results = session.query(AusCityWeather.City).all()
+
+    session.close()
+
+    # Convert list of tuples into normal list
+    all_city_list = list(np.ravel(results))
+
+    return jsonify(all_city_list)
 
 # Returns city weather history
 @app.route("/api/v1.0/rainfall/<location>")
 def start(location):
     # Create our session (link) from Python to the DB
     session = Session(engine)
-
     #get the list of date, minimum maximum and average of the temperature greater than equal to start date
-    results = session.query(AusCityWeather.Date,AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall).\
-    filter(AusCityWeather.Date == location).\
-    order_by(AusCityWeather.Date).all()
+    results = session.query(AusCityWeather.Date,AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall).order_by(AusCityWeather.Date).all()
+    # filter(AusCityWeather.City == location).\
+    # order_by(AusCityWeather.Date).all()
 
     #return the result as a list of dicts
     results_json = []
@@ -77,8 +93,8 @@ def startend(location,year):
     session = Session(engine)
 
     #get the list of date, minimum maximum and average of the temperature greater than equal to start date
-    results = session.query(AusCityWeather.Date,AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall).\
-    filter(AusCityWeather.Location == location and AusCityWeather.Date.strftime("%Y") == year).\
+    results = session.query(AusCityWeather.Date, AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall).\
+    filter(AusCityWeather.City == location and AusCityWeather.Date.strftime("%Y") == year).\
     order_by(AusCityWeather.Date).all()
 
     #return the result as a list of dicts
