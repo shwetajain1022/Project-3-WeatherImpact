@@ -4,11 +4,12 @@ import numpy as np
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine, func, cast,Date
+from sqlalchemy import create_engine, func, cast,Date,distinct
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from sqlalchemy.sql import func
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, make_response
 
 #################################################
 # Database Setup
@@ -44,6 +45,7 @@ def welcome():
     return (
         f"Available Routes:<br/>"
         f"/api/v1.0/city</br>"
+        f"/api/v1.0/year</br>"
         f"/api/v1.0/rainfall/<location></br>"
         f"/api/v1.0/rainfall/<location>/<year></br>"
 
@@ -52,17 +54,38 @@ def welcome():
 def city():
     # Create our session (link) from Python to the DB
     session = Session(engine)
-
     """Return a list of all city"""
     # Query all 
-    results = session.query(AusCityWeather.City).all()
-
+    results = session.query(AusCityWeather.City).distinct().all()
     session.close()
 
     # Convert list of tuples into normal list
     all_city_list = list(np.ravel(results))
+    all_cities = list(set(all_city_list))
+    all_cities.insert(0,"All")
+    response = make_response(jsonify(all_cities))
+    response.headers["Access-Control-Allow-Origin"]="*"
+    return response
 
-    return jsonify(all_city_list)
+@app.route("/api/v1.0/year")
+def year():
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+    # """Return a list of all year"""
+    # Query all 
+    results = session.query(AusCityWeather.Date).all()
+    session.close()
+
+    # Convert list of tuples into normal list
+    all_year_list = list(np.ravel(results))
+    all_year_temp = [int(x[:4]) for x in all_year_list]
+    # print(all_year_temp)
+    all_year = list(set(all_year_temp))
+    all_year.sort()
+    all_year.insert(0,"All")
+    response = make_response(jsonify(all_year))
+    response.headers["Access-Control-Allow-Origin"]="*"
+    return response
 
 # Returns city weather history
 @app.route("/api/v1.0/rainfall/<location>")
