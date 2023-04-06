@@ -4,7 +4,7 @@ import numpy as np
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine, func
+from sqlalchemy import create_engine, func, cast,Date
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -88,13 +88,14 @@ def start(location):
 
 # Returns the min, max, and average temperatures calculated from the given start date to the given end date
 @app.route("/api/v1.0/rainfall/<location>/<year>")
-def startend(location,year):
+def locationyear(location,year):
     # Create our session (link) from Python to the DB
     session = Session(engine)
-
+    startdate = year+'-01-01'
+    enddate = year+'-12-31'
     #get the list of date, minimum maximum and average of the temperature greater than equal to start date
     results = session.query(AusCityWeather.Date, AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall).\
-    filter(AusCityWeather.City == location and AusCityWeather.Date.strftime("%Y") == year).\
+    filter(AusCityWeather.City == location , AusCityWeather.Date >= startdate , AusCityWeather.Date <=enddate).\
     order_by(AusCityWeather.Date).all()
 
     #return the result as a list of dicts
