@@ -94,8 +94,6 @@ def start(location):
     session = Session(engine)
     #get the list of date, minimum maximum and average of the temperature greater than equal to start date
     results = session.query(AusCityWeather.Date,AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall).order_by(AusCityWeather.Date).all()
-    # filter(AusCityWeather.City == location).\
-    # order_by(AusCityWeather.Date).all()
 
     #return the result as a list of dicts
     results_json = []
