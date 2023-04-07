@@ -44,12 +44,35 @@ def welcome():
     """List all available api routes."""
     return (
         f"Available Routes:<br/>"
+        f"/api/v1.0/alldata</br>"
         f"/api/v1.0/city</br>"
         f"/api/v1.0/year</br>"
         f"/api/v1.0/rainfall/<location></br>"
         f"/api/v1.0/rainfall/<location>/<year></br>"
 
     )
+@app.route("/api/v1.0/alldata")
+def alldata():
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+    """Return a list of all city and all year"""
+    # Query all 
+    results = session.query().distinct().all()
+    session.close()
+
+    results_json = []
+    for date,mintemp,maxtemp,rainfall in results:
+        temp_results = {}
+        temp_results["date"]= date
+        temp_results["mintemp"] = mintemp
+        temp_results["maxtemp"]= maxtemp
+        temp_results["Rainfall"] = rainfall
+        results_json.append(temp_results)
+    response = make_response(jsonify(results_json))
+    response.headers["Access-Control-Allow-Origin"]="*"
+    return response
+
+
 @app.route("/api/v1.0/city")
 def city():
     # Create our session (link) from Python to the DB
@@ -92,8 +115,9 @@ def year():
 def start(location):
     # Create our session (link) from Python to the DB
     session = Session(engine)
-    #get the list of date, minimum maximum and average of the temperature greater than equal to start date
-    results = session.query(AusCityWeather.Date,AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall).order_by(AusCityWeather.Date).all()
+    #get the list of date, minimum maximum and average of the temperature for the location
+    results = session.query(AusCityWeather.Date,AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall).\
+    order_by(AusCityWeather.Date).filter(AusCityWeather.City == location).all()
 
     #return the result as a list of dicts
     results_json = []
