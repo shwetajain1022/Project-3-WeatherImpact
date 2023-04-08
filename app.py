@@ -57,12 +57,13 @@ def alldata():
     session = Session(engine)
     """Return a list of all city and all year"""
     # Query all 
-    results = session.query().distinct().all()
+    results = session.query(AusCityWeather.City,AusCityWeather.Date,AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall).all()
     session.close()
 
     results_json = []
-    for date,mintemp,maxtemp,rainfall in results:
+    for city,date,mintemp,maxtemp,rainfall in results:
         temp_results = {}
+        temp_results["city"] = city
         temp_results["date"]= date
         temp_results["mintemp"] = mintemp
         temp_results["maxtemp"]= maxtemp
@@ -71,7 +72,6 @@ def alldata():
     response = make_response(jsonify(results_json))
     response.headers["Access-Control-Allow-Origin"]="*"
     return response
-
 
 @app.route("/api/v1.0/city")
 def city():
@@ -85,7 +85,7 @@ def city():
     # Convert list of tuples into normal list
     all_city_list = list(np.ravel(results))
     all_cities = list(set(all_city_list))
-    all_cities.insert(0,"All")
+    # all_cities.insert(0,"All")
     response = make_response(jsonify(all_cities))
     response.headers["Access-Control-Allow-Origin"]="*"
     return response
@@ -105,7 +105,7 @@ def year():
     # print(all_year_temp)
     all_year = list(set(all_year_temp))
     all_year.sort()
-    all_year.insert(0,"All")
+    # all_year.insert(0,"All")
     response = make_response(jsonify(all_year))
     response.headers["Access-Control-Allow-Origin"]="*"
     return response
@@ -129,7 +129,9 @@ def start(location):
         temp_results["Rainfall"] = rainfall
         results_json.append(temp_results)
 
-    return jsonify(results_json)
+    response = make_response( jsonify(results_json))
+    response.headers["Access-Control-Allow-Origin"]="*"
+    return response
 
 # Returns the min, max, and average temperatures calculated from the given start date to the given end date
 @app.route("/api/v1.0/rainfall/<location>/<year>")
@@ -153,7 +155,9 @@ def locationyear(location,year):
         temp_results["Rainfall"] = rainfall
         results_json.append(temp_results)
 
-    return jsonify(results_json)
+    response = make_response( jsonify(results_json))
+    response.headers["Access-Control-Allow-Origin"]="*"
+    return response
 
 #run the app using Flask
 if __name__ == '__main__':
