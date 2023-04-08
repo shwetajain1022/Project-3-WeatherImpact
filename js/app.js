@@ -70,43 +70,96 @@ function init() {
 init();
 
 //function to create bubble chart
-function drawBarGraph(city_name,weather_year) {
+function drawBarGraph(city_name) {
     //get the url graph
     let urlBarGraph = ""
-    if(weather_year=="All")
-    {
-        urlBarGraph = url+"weather/"+city_name
-    }
-    else
-    {
-        urlBarGraph = url+"weather/"+city_name+"/"+weather_year
-    }
+    urlBarGraph = url+"weather/"+city_name
+    // if(weather_year=="All")
+    // {
+    //     urlBarGraph = url+"weather/"+city_name
+    // }
+    // else
+    // {
+    //     urlBarGraph = url+"weather/"+city_name+"/"+weather_year
+    // }
     console.log(urlBarGraph)
 
     d3.json(urlBarGraph).then(function (data) {
         var rainfall_arr = [];
+        var MaxTemp_arr =[];
+        var MinTemp_arr=[];
         var weatherdates = [];
-        console.log(data)
+        console.log(data);
         for (var value of data) {
             console.log(value["date"]);
             console.log(value["Rainfall"]);
-            rainfall_arr.push(value["date"]);
-            weatherdates.push(value["Rainfall"]);
+            console.log(value["maxtemp"]);
+            console.log(value["mintemp"]);
+            rainfall_arr.push(value["Rainfall"]);
+            MaxTemp_arr.push(value["maxtemp"]);
+            MinTemp_arr.push(value["mintemp"]);
+            weatherdates.push(value["date"]);
         }
         // //CREATE trace variable
         var trace1 = {
-            y: weatherdates,
-            x: rainfall_arr,
-            //text: otu_labels,
-            mode: 'markers',
-            type: "scatter"
-        };
+            type: "scatter",
+            mode: "lines",
+            name: "Max Temp",
+            x: weatherdates,
+            y: MaxTemp_arr,
+            line:{color:'#FF0000'}
+        }
+        var trace2 = {
+            type: "scatter",
+            mode: "lines",
+            name: "Min Temp",
+            x: weatherdates,
+            y: MinTemp_arr,
+            line:{color:'#0000FF'}  
+        }
+        var trace3 = {
+            type: "scatter",
+            mode: "lines",
+            name: "Rainfall",
+            x: weatherdates,
+            y: rainfall_arr,
+            line:{color:'#006600'}
+        }
+        var graph = [trace1,trace2,trace3];
         //Set the layout
-        let layout = {
-            title: "Date v/s Rain"
+        var layout = {
+            title: "Date vs. Temperature Extremes",
+            xaxis: {
+                autorange: true,
+                range: ['2007-01-01', '2023-04-01'],
+                raneselector: {button: [
+                    {
+                        count: 1,
+                        label: '1m',
+                        step: 'month',
+                        stepmode: 'backward'
+                    },
+                    {
+                        count: 6,
+                        label: '6m',
+                        step: 'month',
+                        stepmode: 'backward'
+                    },
+                    {step: 'all'}
+                ]},
+                rangeslider: {range: ['2007-01-01', '2023-04-01']},
+                type: 'date'
+
+            },
+            yaxis: {
+                autorange: true,
+                range: [-10,50],
+                type: 'linear'
+
+            }
         };
         //Plot the Graph
-        Plotly.newPlot("plot", [trace1], layout);
+        Plotly.newPlot("plot", graph, layout);
     });
 }
 
