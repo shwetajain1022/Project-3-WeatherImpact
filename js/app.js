@@ -75,21 +75,31 @@ function drawBarGraph(city_name,weather_year) {
     let urlBarGraph = ""
     if(weather_year=="All")
     {
-        urlBarGraph = url+"location/"+city_name
+        urlBarGraph = url+"rainfall/"+city_name
     }
-    urlBarGraph = url+"location/"+city_name
+    else
+    {
+        urlBarGraph = url+"rainfall/"+city_name+"/"+weather_year
+    }
     console.log(urlBarGraph)
+
     d3.json(urlBarGraph).then(function (data) {
-        let rainfall_dataset = data.filter(rainfall => rainfall.City == "Sydney");
-        let rainfall = rainfall_dataset[0].Rainfall;
-        let weatherdate = rainfall_dataset[0].date;
-        //CREATE trace variable
+        var rainfall_arr = [];
+        var weatherdates = [];
+        console.log(data)
+        for (var value of data) {
+            console.log(value["date"]);
+            console.log(value["Rainfall"]);
+            rainfall_arr.push(value["date"]);
+            weatherdates.push(value["Rainfall"]);
+        }
+        // //CREATE trace variable
         var trace1 = {
-            x: weatherdate,
-            y: rainfall,
+            y: weatherdates,
+            x: rainfall_arr,
             //text: otu_labels,
             mode: 'markers',
-            type: "bar"
+            type: "scatter"
         };
         //Set the layout
         let layout = {
