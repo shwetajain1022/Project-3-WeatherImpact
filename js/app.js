@@ -75,11 +75,11 @@ function drawBarGraph(city_name,weather_year) {
     let urlBarGraph = ""
     if(weather_year=="All")
     {
-        urlBarGraph = url+"rainfall/"+city_name
+        urlBarGraph = url+"weather/"+city_name
     }
     else
     {
-        urlBarGraph = url+"rainfall/"+city_name+"/"+weather_year
+        urlBarGraph = url+"weather/"+city_name+"/"+weather_year
     }
     console.log(urlBarGraph)
 

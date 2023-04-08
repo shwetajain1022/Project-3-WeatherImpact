@@ -47,8 +47,8 @@ def welcome():
         f"/api/v1.0/alldata</br>"
         f"/api/v1.0/city</br>"
         f"/api/v1.0/year</br>"
-        f"/api/v1.0/rainfall/<location></br>"
-        f"/api/v1.0/rainfall/<location>/<year></br>"
+        f"/api/v1.0/weather/<location></br>"
+        f"/api/v1.0/weather/<location>/<year></br>"
 
     )
 @app.route("/api/v1.0/alldata")
@@ -57,17 +57,18 @@ def alldata():
     session = Session(engine)
     """Return a list of all city and all year"""
     # Query all 
-    results = session.query(AusCityWeather.City,AusCityWeather.Date,AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall).all()
+    results = session.query(AusCityWeather.City,AusCityWeather.Date,AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall,AusCityWeather.WindGustSpeed).all()
     session.close()
 
     results_json = []
-    for city,date,mintemp,maxtemp,rainfall in results:
+    for city,date,mintemp,maxtemp,rainfall,windgustspeed in results:
         temp_results = {}
         temp_results["city"] = city
         temp_results["date"]= date
         temp_results["mintemp"] = mintemp
         temp_results["maxtemp"]= maxtemp
         temp_results["Rainfall"] = rainfall
+        temp_results["WindGustSpeed"] = windgustspeed
         results_json.append(temp_results)
     response = make_response(jsonify(results_json))
     response.headers["Access-Control-Allow-Origin"]="*"
@@ -111,22 +112,23 @@ def year():
     return response
 
 # Returns city weather history
-@app.route("/api/v1.0/rainfall/<location>")
+@app.route("/api/v1.0/weather/<location>")
 def start(location):
     # Create our session (link) from Python to the DB
     session = Session(engine)
     #get the list of date, minimum maximum and average of the temperature for the location
-    results = session.query(AusCityWeather.Date,AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall).\
+    results = session.query(AusCityWeather.Date,AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall,AusCityWeather.WindGustSpeed).\
     order_by(AusCityWeather.Date).filter(AusCityWeather.City == location).all()
 
     #return the result as a list of dicts
     results_json = []
-    for date,mintemp,maxtemp,rainfall in results:
+    for date,mintemp,maxtemp,rainfall,windgustspeed in results:
         temp_results = {}
         temp_results["date"]= date
         temp_results["mintemp"] = mintemp
         temp_results["maxtemp"]= maxtemp
         temp_results["Rainfall"] = rainfall
+        temp_results["WindGustSpeed"] = windgustspeed
         results_json.append(temp_results)
 
     response = make_response( jsonify(results_json))
@@ -134,25 +136,26 @@ def start(location):
     return response
 
 # Returns the min, max, and average temperatures calculated from the given start date to the given end date
-@app.route("/api/v1.0/rainfall/<location>/<year>")
+@app.route("/api/v1.0/weather/<location>/<year>")
 def locationyear(location,year):
     # Create our session (link) from Python to the DB
     session = Session(engine)
     startdate = year+'-01-01'
     enddate = year+'-12-31'
     #get the list of date, minimum maximum and average of the temperature greater than equal to start date
-    results = session.query(AusCityWeather.Date, AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall).\
+    results = session.query(AusCityWeather.Date, AusCityWeather.MinTemp ,AusCityWeather.MaxTemp,AusCityWeather.Rainfall,AusCityWeather.WindGustSpeed).\
     filter(AusCityWeather.City == location , AusCityWeather.Date >= startdate , AusCityWeather.Date <=enddate).\
     order_by(AusCityWeather.Date).all()
 
     #return the result as a list of dicts
     results_json = []
-    for date,mintemp,maxtemp,rainfall in results:
+    for date,mintemp,maxtemp,rainfall,windgustspeed in results:
         temp_results = {}
         temp_results["date"]= date
         temp_results["mintemp"] = mintemp
         temp_results["maxtemp"]= maxtemp
         temp_results["Rainfall"] = rainfall
+        temp_results["WindGustSpeed"] = windgustspeed
         results_json.append(temp_results)
 
     response = make_response( jsonify(results_json))
