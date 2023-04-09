@@ -6,25 +6,21 @@ let samples = [];
 //get the dropdown element 
 let d3cityselect = d3.select("#selCityDataset");
 
-let d3yearselect = d3.select("#selYearDataset");
-
 d3.select("#selCityDataset").on("change", updateGraph);
-d3.select("#selYearDataset").on("change", updateGraph);
 
 function updateGraph()
 {
     let city_name = d3.select("#selCityDataset").property("value");
-    let weather_year = d3.select("#selYearDataset").property("value");
 
     console.log(city_name);
-    console.log(weather_year);
-    drawBarGraph(city_name,weather_year);
+
+    drawBarGraph(city_name);
 }
 
 //Function to initialize the first landing web page
 function init() {
     let urlcities = url + "city"
-    let urlyear = url + "year"
+
     //get the city json data
     d3.json(urlcities).then(function (data) {
         //get the samples
@@ -44,27 +40,7 @@ function init() {
         //change the bar chart and bubble chart
         updateGraph();
     });
-    //get the year json data
-    d3.json(urlyear).then(function (data) {
-        //get the samples
-        year_list = data;
-
-        //update to dropdown menu with sample ids list
-        var options = d3yearselect.selectAll("option")
-            .data(year_list)
-            .enter()
-            .append("option");
-        options.text(function (datavalue) {
-            return datavalue;
-        })
-            .attr("value", function (datavalue) {
-                return datavalue;
-            });
-        //change the bar chart and bubble chart
-        updateGraph();
-    });
 }
-
 
 //Calling Init function to display charts for the first OTUs
 init();
@@ -74,14 +50,7 @@ function drawBarGraph(city_name) {
     //get the url graph
     let urlBarGraph = ""
     urlBarGraph = url+"weather/"+city_name
-    // if(weather_year=="All")
-    // {
-    //     urlBarGraph = url+"weather/"+city_name
-    // }
-    // else
-    // {
-    //     urlBarGraph = url+"weather/"+city_name+"/"+weather_year
-    // }
+    
     console.log(urlBarGraph)
 
     d3.json(urlBarGraph).then(function (data) {
